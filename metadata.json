@@ -1,0 +1,5 @@
+{
+  "name": "AI Koki Nusantara",
+  "description": "An AI-powered application to discover Indonesian recipes based on the ingredients you have. Generates recipes and dish images using Gemini.",
+  "requestFramePermissions": []
+}
