@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Header } from './components/Header';
 import { IngredientForm } from './components/IngredientForm';
 import { RecipeDisplay } from './components/RecipeDisplay';
@@ -16,6 +16,8 @@ const App: React.FC = () => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [imageGenerationError, setImageGenerationError] = useState<string | null>(null);
+  const [generateImage, setGenerateImage] = useState<boolean>(true);
 
   const handleGenerate = useCallback(async () => {
     if (!ingredients.trim()) {
@@ -26,18 +28,22 @@ const App: React.FC = () => {
     setError(null);
     setRecipe(null);
     setImageUrl(null);
+    setImageGenerationError(null);
 
     try {
-      const result = await generateRecipeAndImage(ingredients);
+      const result = await generateRecipeAndImage(ingredients, generateImage);
       setRecipe(result.recipe);
       setImageUrl(result.imageUrl);
+      if (result.imageError) {
+        setImageGenerationError(result.imageError);
+      }
     } catch (err) {
       console.error(err);
       setError(err instanceof Error ? err.message : 'Terjadi kesalahan saat membuat resep. Silakan coba lagi.');
     } finally {
       setIsLoading(false);
     }
-  }, [ingredients]);
+  }, [ingredients, generateImage]);
 
   const handleSuggestionClick = (suggestion: string) => {
     setIngredients(suggestion);
@@ -54,15 +60,19 @@ const App: React.FC = () => {
             onGenerate={handleGenerate}
             isLoading={isLoading}
             onSuggestionClick={handleSuggestionClick}
+            generateImage={generateImage}
+            setGenerateImage={setGenerateImage}
           />
 
-          {error && <ErrorAlert message={error} />}
+          {error && <ErrorAlert title="Oops! Terjadi Kesalahan" message={error} />}
+          
+          {imageGenerationError && !isLoading && <ErrorAlert title="Peringatan" message={imageGenerationError} type="warning" />}
 
           {isLoading && <LoadingSpinner />}
           
           {!isLoading && !error && !recipe && <Welcome />}
 
-          {!isLoading && !error && recipe && imageUrl && (
+          {!isLoading && !error && recipe && (
             <RecipeDisplay recipe={recipe} imageUrl={imageUrl} />
           )}
         </div>

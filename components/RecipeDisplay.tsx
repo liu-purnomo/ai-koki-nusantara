@@ -1,11 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Recipe } from '../types';
 import { BookOpenIcon, CameraIcon, ClockIcon, UsersIcon } from './icons';
 
 interface RecipeDisplayProps {
   recipe: Recipe;
-  imageUrl: string;
+  imageUrl: string | null;
 }
 
 type ActiveTab = 'recipe' | 'image';
@@ -13,13 +13,20 @@ type ActiveTab = 'recipe' | 'image';
 export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({ recipe, imageUrl }) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('recipe');
 
+  useEffect(() => {
+    // If imageUrl becomes null (e.g., user unchecks the box), reset to recipe tab.
+    if (!imageUrl) {
+      setActiveTab('recipe');
+    }
+  }, [imageUrl]);
+
   return (
     <div className="bg-white rounded-xl shadow-lg border border-stone-200 overflow-hidden animate-fade-in">
       <div className="border-b border-stone-200">
         <nav className="flex space-x-1 p-1 bg-amber-50/50" aria-label="Tabs">
           <button
             onClick={() => setActiveTab('recipe')}
-            className={`flex items-center w-1/2 justify-center px-3 py-2 font-medium text-sm rounded-lg ${
+            className={`flex items-center ${imageUrl ? 'w-1/2' : 'w-full'} justify-center px-3 py-2 font-medium text-sm rounded-lg ${
               activeTab === 'recipe'
                 ? 'bg-orange-600 text-white shadow'
                 : 'text-stone-600 hover:bg-stone-200'
@@ -28,17 +35,19 @@ export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({ recipe, imageUrl }
             <BookOpenIcon className="h-5 w-5 mr-2" />
             Resep
           </button>
-          <button
-            onClick={() => setActiveTab('image')}
-            className={`flex items-center w-1/2 justify-center px-3 py-2 font-medium text-sm rounded-lg ${
-              activeTab === 'image'
-                ? 'bg-orange-600 text-white shadow'
-                : 'text-stone-600 hover:bg-stone-200'
-            } transition-all duration-200`}
-          >
-            <CameraIcon className="h-5 w-5 mr-2" />
-            Foto Hidangan
-          </button>
+          {imageUrl && (
+            <button
+              onClick={() => setActiveTab('image')}
+              className={`flex items-center w-1/2 justify-center px-3 py-2 font-medium text-sm rounded-lg ${
+                activeTab === 'image'
+                  ? 'bg-orange-600 text-white shadow'
+                  : 'text-stone-600 hover:bg-stone-200'
+              } transition-all duration-200`}
+            >
+              <CameraIcon className="h-5 w-5 mr-2" />
+              Foto Hidangan
+            </button>
+          )}
         </nav>
       </div>
 
@@ -69,10 +78,12 @@ export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({ recipe, imageUrl }
             </div>
           </div>
         ) : (
-          <div className="animate-fade-in-slow">
-            <h3 className="text-xl font-semibold text-stone-700 text-center mb-4">Visualisasi Hidangan: {recipe.recipeName}</h3>
-            <img src={imageUrl} alt={`Generated image of ${recipe.recipeName}`} className="rounded-lg shadow-md w-full h-auto object-cover" />
-          </div>
+          imageUrl && (
+            <div className="animate-fade-in-slow">
+              <h3 className="text-xl font-semibold text-stone-700 text-center mb-4">Visualisasi Hidangan: {recipe.recipeName}</h3>
+              <img src={imageUrl} alt={`Generated image of ${recipe.recipeName}`} className="rounded-lg shadow-md w-full h-auto object-cover" />
+            </div>
+          )
         )}
       </div>
     </div>

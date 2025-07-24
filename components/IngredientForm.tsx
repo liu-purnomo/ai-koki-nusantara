@@ -8,11 +8,13 @@ interface IngredientFormProps {
   onGenerate: () => void;
   isLoading: boolean;
   onSuggestionClick: (suggestion: string) => void;
+  generateImage: boolean;
+  setGenerateImage: (value: boolean) => void;
 }
 
 const suggestions = ["Ayam, bawang, kecap manis", "Tahu, telur, tauge", "Daging sapi, santan, kelapa parut"];
 
-export const IngredientForm: React.FC<IngredientFormProps> = ({ ingredients, setIngredients, onGenerate, isLoading, onSuggestionClick }) => {
+export const IngredientForm: React.FC<IngredientFormProps> = ({ ingredients, setIngredients, onGenerate, isLoading, onSuggestionClick, generateImage, setGenerateImage }) => {
   return (
     <div className="bg-white p-6 rounded-xl shadow-lg border border-stone-200 w-full">
       <div className="text-center mb-4">
@@ -39,6 +41,19 @@ export const IngredientForm: React.FC<IngredientFormProps> = ({ ingredients, set
             {s}
           </button>
         ))}
+      </div>
+       <div className="flex items-center my-4">
+        <input
+          id="generate-image-checkbox"
+          type="checkbox"
+          checked={generateImage}
+          onChange={(e) => setGenerateImage(e.target.checked)}
+          disabled={isLoading}
+          className="h-4 w-4 rounded border-stone-300 text-orange-600 focus:ring-orange-500"
+        />
+        <label htmlFor="generate-image-checkbox" className="ml-2 block text-sm text-stone-600">
+          Sertakan gambar hidangan <span className="text-xs text-stone-400">(memerlukan akun berbayar)</span>
+        </label>
       </div>
       <button
         onClick={onGenerate}
